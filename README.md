@@ -116,7 +116,7 @@ TODO
 
 You can also directly run ./code/run_preprocess.sh and ./code/run_nsm.sh. <br>
 
-You can download the folder tmp from [here] (https://pan.baidu.com/s/1EUR5kxDxiDr-SzZ2dQ4bPQ?pwd=y408) with password y408.
+You can download the folder tmp from [here](https://pan.baidu.com/s/1EUR5kxDxiDr-SzZ2dQ4bPQ?pwd=y408) with password y408.
 
 ### If you have any questions about the code, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
 
