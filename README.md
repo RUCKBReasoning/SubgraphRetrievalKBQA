@@ -118,6 +118,8 @@ TODO
 
 ### You can also directly run ./code/run_preprocess.sh and ./code/run_nsm.sh.
 
+### You can download the folder tmp from xxxx
+
 ### If you have any questions about our paper, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
 
 python run_preprocess.py \
