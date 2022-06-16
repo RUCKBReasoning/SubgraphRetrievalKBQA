@@ -1,0 +1,96 @@
+"""
+枚举头实体到答案的所有简单路径，（限制这些路径长度不超过最短路径长度+1)
+每个进程将结果写入自己对应的文件中
+"""
+import multiprocessing
+import time
+import math
+import networkx as nx
+import os
+import json
+from tqdm import tqdm
+from func_timeout import func_set_timeout, FunctionTimedOut
+
+from utils import load_jsonl
+from knowledge_graph import KonwledgeGraph
+
+@func_set_timeout(60)
+def generate_paths(item, G, pair_max: int = 20, path_max: int = 100):
+    paths = []
+    entities = [entity for entity in item['topic_entities'] if entity in G]
+    answers = [answer for answer in item['answers'] if answer in G]
+    for src in entities:
+        for tgt in answers:
+            if len(paths) > path_max:
+                break
+            if not nx.has_path(G, src, tgt):
+                continue
+            min_length = nx.shortest_path_length(G, src, tgt)
+            if min_length > 3:
+                continue
+            cutoff = min(3, min_length+1)
+            cnt = 0
+            # search shortest path first, then search shortest+1
+            n_paths = []
+            for p in nx.all_simple_edge_paths(G, src, tgt, min_length):
+                n_paths.append(p)
+                cnt += 1
+                if cnt > pair_max:
+                    break
+            if cutoff > min_length:
+                for p in nx.all_simple_edge_paths(G, src, tgt, cutoff):
+                    if p in n_paths:
+                        continue
+                    else:
+                        n_paths.append(p)
+                        cnt += 1
+                    if cnt > pair_max:
+                        break
+            paths.extend(n_paths)
+    return paths[:path_max]
+
+def run_sequential(args):
+    seq_id = args["seq_id"]
+    item_list = args["item_list"]
+    G = args["G"]
+    
+    timeout_count = 0
+
+    t = time.time()
+    print(f"[id: {seq_id}] start time: {t}")
+    filename = str(seq_id)+'_datalist.jsonl'
+    filepath = os.path.join("../tmp/preprocessing", filename)
+    outf = open(filepath, 'w')
+    for item in tqdm(item_list):
+        try:
+            paths = generate_paths(item, G)
+        except FunctionTimedOut as e:
+            timeout_count += 1
+            print("timeout: {}".format(e.msg))
+            continue
+        outline = json.dumps([item, paths], ensure_ascii=False)
+        print(outline, file=outf)
+        outf.flush()
+    outf.close()
+    e = time.time()
+    print(f"[id: {seq_id}] time cost: {e-t}")
+    print("timeout count: {}".format(timeout_count))
+
+def run_search_to_get_path():
+    knowledge_graph_ckpt = '../../data/knowledge_graph.kg_data'
+    kg = KonwledgeGraph.load_from_ckpt(knowledge_graph_ckpt)
+    G = kg.G
+
+    train_dataset = load_jsonl('../tmp/retriever/train.jsonl')
+
+    valid_list = []
+    for item in tqdm(train_dataset, desc="generate valid list"):
+        entities = [entity for entity in item['topic_entities'] if entity in G]
+        answers = [answer for answer in item['answers'] if answer in G]
+        if any((nx.has_path(G, src, tgt) for src in entities for tgt in answers)):
+            valid_list.append(item)
+    
+    # test
+    # valid_list = valid_list[:10]
+
+    run_sequential({"seq_id": 0, "item_list": valid_list, "G": G})
