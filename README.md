@@ -118,6 +118,6 @@ TODO
 
 ### You can download the folder tmp from xxxx
 
-### If you have any questions about our paper, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
+### If you have any questions about the code, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
 
 
