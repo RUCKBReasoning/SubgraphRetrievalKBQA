@@ -122,7 +122,4 @@ TODO
 
 ### If you have any questions about our paper, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
 
-python run_preprocess.py \
-    --dataset_name ${dataset_name} \
-    --train_dataset_path ${train_dataset_path} \
-    --test_dataset_path ${test_dataset_path}
+
