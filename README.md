@@ -30,11 +30,13 @@ python run_preprocess.py \
 to obtain weak_supervised_train.csv
 
 The Format of weak_supervised_train.json is <br>
-'''
+
+`
 The first column: question plus the first t-1 steps' relations <br>
 The second column: the positive relation of the t step <br>
 All the subsequent columns: the negative sampled relations of the t step <br>
-'''
+`
+
 ## 4. How to obtain the unsupervised dataset for training the retriever?
 TODO
 
