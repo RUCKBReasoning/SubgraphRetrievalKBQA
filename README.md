@@ -19,15 +19,17 @@ Freebase.
 Same as the original [CWQ dataset](https://allenai.org/data/complexwebquestions)
 
 ## 3. How to obtain the weak-supervised dataset for training the retriever?
-1. run ./code/preprocessing/search_to_get_path.py and ./code/preprocessing/path_to_relation_list.py to obtain train_with_path_score.jsonl, which only contains postive instances, i.e., the right relations in a path for each question.    
+'''
+python run_preprocess.py  --dataset_name ${dataset_name} --train_dataset_path ${train_dataset_path}  --test_dataset_path ${test_dataset_path}
+'''
+to obtain weak_supervised_train.csv
 
-2. Then you need to perform negative sampling by replacing the positive relation at each time step with another relation sampled from the other neighboring relations of current step. By doing this, you can obtain the final weak-supervised training data ./code/retriever/data/multi_hop_train.csv.
-
-3. Format of multi-hop_train.csv  <br>
+The Format of weak_supervised_train.json is <br>
+'''
 The first column: question plus the first t-1 steps' relations <br>
 The second column: the positive relation of the t step <br>
 All the subsequent columns: the negative sampled relations of the t step <br>
-
+'''
 ## 4. How to obtain the unsupervised dataset for training the retriever?
 TODO
 
@@ -50,6 +52,8 @@ run ./code/reader/NSM/main_nsm.py by replacing the file *_simple.json in the its
 
 ## How to perform end-to-end training?
 TODO
+
+### You can also run ./code/run_preprocess.sh
 
 
 ### If you have any questions about our paper, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
