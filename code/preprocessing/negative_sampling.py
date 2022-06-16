@@ -85,5 +85,4 @@ def run_negative_sampling():
     
     new_data_list = np.array(new_data_list)
     df = pd.DataFrame(new_data_list)
-    df.to_csv("../retriever/data/multi_hop_train.csv", header=False, index=False)
-
+    df.to_csv("../tmp/retriever/multi_hop_train.csv", header=False, index=False)

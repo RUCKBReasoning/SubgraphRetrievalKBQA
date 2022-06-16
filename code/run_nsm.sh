@@ -1,7 +1,7 @@
 cd reader
 
 CUDA_VISIBLE_DEVICES=1 python main_nsm.py \
-    --data_folder "../tmp/reader/" \
+    --data_folder "../tmp/reader_default/" \
     --checkpoint_dir "../tmp/model_ckpt/nsm/" \
     --model_name gnn \
     --batch_size 20 \

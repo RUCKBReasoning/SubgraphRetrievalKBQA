@@ -2,6 +2,7 @@
 获取简单路径所对应的 relation 路径, 并计算该 relation 路径的得分
 relation 路径的得分定义为, 使用该路径实例化得到的预测结果相比较答案的 HIT 得分
 """
+import os
 from copy import deepcopy
 import glob
 from tqdm import tqdm
@@ -11,7 +12,7 @@ from utils import load_jsonl, dump_jsonl
 
 def run_path_to_relation():
 
-    knowledge_graph_ckpt = '../../data/knowledge_graph.kg_data'
+    knowledge_graph_ckpt = '../tmp/knowledge_graph.kg_data'
     kg = KonwledgeGraph.load_from_ckpt(knowledge_graph_ckpt)
     G = kg.G
 
@@ -55,4 +56,7 @@ def run_path_to_relation():
         m_item['path_and_score_list'] = path_and_score_list
         m_list.append(m_item)
 
+    if not os.path.exists("../tmp/retriever"):
+        os.makedirs("../tmp/retriever")
+    
     dump_jsonl(m_list, '../tmp/retriever/train_with_path_score.jsonl')

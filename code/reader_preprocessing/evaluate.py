@@ -4,7 +4,7 @@ from tqdm import tqdm
 from utils import load_jsonl
 from knowledge_graph import KonwledgeGraph
 
-knowledge_graph_ckpt = '../../data/knowledge_graph.kg_data'
+knowledge_graph_ckpt = '../tmp/knowledge_graph.kg_data'
 load_data_path = "../tmp/reader"
 
 train_dataset = load_jsonl(os.path.join(load_data_path, "train_simple.json"))

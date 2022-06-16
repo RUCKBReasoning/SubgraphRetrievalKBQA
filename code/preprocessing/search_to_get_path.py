@@ -59,6 +59,10 @@ def run_sequential(args):
     t = time.time()
     print(f"[id: {seq_id}] start time: {t}")
     filename = str(seq_id)+'_datalist.jsonl'
+    
+    if not os.path.exists("../tmp/preprocessing"):
+        os.makedirs("../tmp/preprocessing")
+
     filepath = os.path.join("../tmp/preprocessing", filename)
     outf = open(filepath, 'w')
     for item in tqdm(item_list):
@@ -77,7 +81,7 @@ def run_sequential(args):
     print("timeout count: {}".format(timeout_count))
 
 def run_search_to_get_path():
-    knowledge_graph_ckpt = '../../data/knowledge_graph.kg_data'
+    knowledge_graph_ckpt = '../tmp/knowledge_graph.kg_data'
     kg = KonwledgeGraph.load_from_ckpt(knowledge_graph_ckpt)
     G = kg.G
 
@@ -90,7 +94,4 @@ def run_search_to_get_path():
         if any((nx.has_path(G, src, tgt) for src in entities for tgt in answers)):
             valid_list.append(item)
     
-    # test
-    # valid_list = valid_list[:10]
-
     run_sequential({"seq_id": 0, "item_list": valid_list, "G": G})

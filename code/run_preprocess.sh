@@ -4,12 +4,13 @@ set -e
 
 device=1
 dataset_name="webqsp"
-train_dataset_path="../../data/WebQSP/data/WebQSP.train.json"
-test_dataset_path="../../data/WebQSP/data/WebQSP.test.json"
 
 # preprocessing begin
 
 cd preprocessing
+
+train_dataset_path="../tmp/data/WebQSP/data/WebQSP.train.json"
+test_dataset_path="../tmp/data/WebQSP/data/WebQSP.test.json"
 
 python run_preprocess.py \
     --dataset_name ${dataset_name} \
@@ -29,7 +30,7 @@ output_dir="../tmp/model_ckpt/SimBERT"
 
 CUDA_VISIBLE_DEVICES=${device} python train.py \
     --model_name_or_path roberta-base \
-    --train_file "../tmp/retriever/multi_hop_train.csv" \
+    --train_file "../tmp/retriever/weak_supervised_train.csv" \
     --output_dir ${output_dir} \
     --num_train_epochs 10 \
     --per_device_train_batch_size 16 \
@@ -54,12 +55,14 @@ cd ..
 if [ ${dataset_name} == "webqsp" ]
 then
 
-    cp tmp/nsm_origin/webqsp/* tmp/reader
+    load_data_path="../tmp/nsm_data/webqsp"
+
+    cp ${load_data_path}/* tmp/reader
     cd reader_preprocessing
 
     CUDA_VISIBLE_DEVICES=${device} python retrieve_subgraph.py \
-        --load_data_path "../tmp/nsm_origin/webqsp/" \
-        --dump_data_path "../tmp/reader_test/"
+        --load_data_path ${load_data_path} \
+        --dump_data_path "../tmp/reader/"
 
     python evaluate.py
 

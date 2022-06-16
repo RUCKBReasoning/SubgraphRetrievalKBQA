@@ -3,13 +3,15 @@ import os
 import torch
 
 from typing import Tuple, List, Any, Dict
+
+from yaml import dump
 from utils import dump_jsonl, load_jsonl
 from tqdm import tqdm
 from knowledge_graph import KonwledgeGraph
 from transformers import AutoModel, AutoTokenizer
 
 
-knowledge_graph_ckpt = '../../data/knowledge_graph.kg_data'
+knowledge_graph_ckpt = '../tmp/knowledge_graph.kg_data'
 retrieval_model_ckpt = '../tmp/model_ckpt/SimBERT'
 device = 'cuda'
 
@@ -163,6 +165,9 @@ if __name__ == '__main__':
     
     load_data_path = args.load_data_path
     dump_data_path = args.dump_data_path
+    
+    if not os.path.exists(dump_data_path):
+        os.makedirs(dump_data_path)
     
     train_dataset = load_jsonl(os.path.join(load_data_path, "train_simple.json"))
     test_dataset = load_jsonl(os.path.join(load_data_path, "test_simple.json"))    
