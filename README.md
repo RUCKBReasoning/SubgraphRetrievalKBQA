@@ -20,17 +20,16 @@ Same as the original [CWQ dataset](https://allenai.org/data/complexwebquestions)
 
 ## 3. How to obtain the weak-supervised dataset for training the retriever?
 
-`
-cd preprocessing
-python run_preprocess.py \
-    --dataset_name ${dataset_name} \
-    --train_dataset_path ${train_dataset_path} \
-    --test_dataset_path ${test_dataset_path}
-python run_preprocess.py \
-    --dataset_name ${dataset_name} \
-    --train_dataset_path ${train_dataset_path} \
-    --test_dataset_path ${test_dataset_path}
-`
+    cd preprocessing
+    python run_preprocess.py \
+        --dataset_name ${dataset_name} \
+        --train_dataset_path ${train_dataset_path} \
+        --test_dataset_path ${test_dataset_path}
+    python run_preprocess.py \
+        --dataset_name ${dataset_name} \
+        --train_dataset_path ${train_dataset_path} \
+        --test_dataset_path ${test_dataset_path}
+
 
 to obtain weak_supervised_train.csv
 
