@@ -72,7 +72,7 @@ class Trainer_KBQA(object):
             print("Load ckpt from", ckpt_path)
             self.load_ckpt(ckpt_path)
 
-    def evaluate(self, data, test_batch_size=20, mode="teacher", write_info=False):
+    def evaluate(self, data, test_batch_size=20, mode="teacher", write_info=True):
         return self.evaluator.evaluate(data, test_batch_size, write_info)
 
     def train(self, start_epoch, end_epoch):

@@ -7,8 +7,8 @@ DatasetPath = namedtuple('DataPath', ['train_dataset_path', 'test_dataset_path']
 
 def load_webqsp(path: DatasetPath):
     tmpDatasetPath = DatasetPath(
-        train_dataset_path="../tmp/train.jsonl",
-        test_dataset_path="../tmp/test.jsonl"
+        train_dataset_path="../tmp/retriever/train.jsonl",
+        test_dataset_path="../tmp/retriever/test.jsonl"
     )
     with open(path.train_dataset_path, "r") as f:
         train_dataset = json.loads(f.read())

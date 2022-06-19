@@ -20,6 +20,8 @@ CUDA_VISIBLE_DEVICES=1 python main_nsm.py \
     --lr 5e-4 \
     --word_emb_file word_emb_300d.npy \
     --loss_type kl \
-    --reason_kb
+    --reason_kb \
+    --is_eval \
+    --load_experiment "webqsp_nsm-final.ckpt"
 
 cd ..

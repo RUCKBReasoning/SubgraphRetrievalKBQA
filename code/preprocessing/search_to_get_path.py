@@ -14,7 +14,7 @@ from func_timeout import func_set_timeout, FunctionTimedOut
 from utils import load_jsonl
 from knowledge_graph import KonwledgeGraph
 
-@func_set_timeout(60)
+@func_set_timeout(30)
 def generate_paths(item, G, pair_max: int = 20, path_max: int = 100):
     paths = []
     entities = [entity for entity in item['topic_entities'] if entity in G]
@@ -26,9 +26,9 @@ def generate_paths(item, G, pair_max: int = 20, path_max: int = 100):
             if not nx.has_path(G, src, tgt):
                 continue
             min_length = nx.shortest_path_length(G, src, tgt)
-            if min_length > 3:
+            if min_length > 2:
                 continue
-            cutoff = min(3, min_length+1)
+            cutoff = min(2, min_length+1)
             cnt = 0
             # search shortest path first, then search shortest+1
             n_paths = []
