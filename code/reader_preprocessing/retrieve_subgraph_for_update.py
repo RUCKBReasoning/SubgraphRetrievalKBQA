@@ -11,12 +11,6 @@ from tqdm import tqdm
 from knowledge_graph import KonwledgeGraph
 from transformers import AutoModel, AutoTokenizer
 
-from loguru import logger
-logger.remove(handler_id=None)
-logger.add("log.txt")
-
-_min_score = 100.0
-
 END_REL = "END OF HOP"
 
 knowledge_graph_ckpt = '../tmp/knowledge_graph.kg_data'
@@ -118,8 +112,6 @@ def infer_paths_from_kb(question: str, topic_entity: str, num_beams: int, num_re
 def merge_paths(paths: List[Tuple[List[str], float]]):
     pass
 
-scores = []
-
 def retrieve_subgraph(json_obj: Dict[str, Any], entity2id, relation2id, entities, rels):
     question = json_obj["question"]
     if len(json_obj["entities"]) == 0:
@@ -140,11 +132,8 @@ def retrieve_subgraph(json_obj: Dict[str, Any], entity2id, relation2id, entities
         
         if len(answers) / len(partial_nodes) >= 0.5 and len(answers & set(partial_nodes)) > 0:
             new_obj["pos_paths"].append(path)
-            scores.append((1, score))
-            logger.info("pos score: {}".format(score))
         else:
             new_obj["neg_paths"].append(path)
-            logger.info("neg score: {}".format(score))
     
     return question, new_obj
     
@@ -200,8 +189,5 @@ if __name__ == '__main__':
         if question is not None:
             update_paths[question] = path_obj
 
-    # with open("../tmp/retriever/update_paths.json", "w") as f:
-    #     f.write(json.dumps(update_paths) + "\n")
-
-    # print("scores:", scores)
-    print("min_score:", min(scores))
+    with open("../tmp/retriever/update_paths.json", "w") as f:
+        f.write(json.dumps(update_paths) + "\n")

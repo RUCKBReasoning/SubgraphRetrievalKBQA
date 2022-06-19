@@ -12,6 +12,7 @@ from transformers import AutoModel, AutoTokenizer
 
 from loguru import logger
 
+logger.remove(handler_id=None)
 logger.add("retr.log")
 
 END_REL = "END OF HOP"
