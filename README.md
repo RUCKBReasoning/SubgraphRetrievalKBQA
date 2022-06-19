@@ -114,10 +114,12 @@ Each line of the file includes a question, topic entities, answers, subgraph com
 ## How to perform end-to-end training?
 TODO
 
-### You can also directly run ./code/run_preprocess.sh and ./code/run_nsm.sh.
+You can also directly run 
+    ./code/run_preprocess.sh
+    ./code/run_nsm.sh. 
 
-### You can download the folder tmp from xxxx
+You can download the folder tmp from [here](https://pan.baidu.com/s/1EUR5kxDxiDr-SzZ2dQ4bPQ?pwd=y408) with password y408.
 
-### If you have any questions about our paper, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
+### If you have any questions about the code, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
 
 
