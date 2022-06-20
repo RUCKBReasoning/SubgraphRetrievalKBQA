@@ -3,3 +3,4 @@ code/tmp/
 **/data/
 download/
 **/*.log
+tmp.py

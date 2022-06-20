@@ -2,17 +2,19 @@
 
 set -e
 
-device=1
+device=0
 dataset_name="webqsp"
 
 # preprocessing begin
 
 # cd preprocessing
 
+# KG_name="Freebase"
 # train_dataset_path="../tmp/data/WebQSP/data/WebQSP.train.json"
 # test_dataset_path="../tmp/data/WebQSP/data/WebQSP.test.json"
 
 # python run_preprocess.py \
+#     --KG_name ${KG_name} \
 #     --dataset_name ${dataset_name} \
 #     --train_dataset_path ${train_dataset_path} \
 #     --test_dataset_path ${test_dataset_path}
@@ -58,7 +60,7 @@ then
 
     load_data_path="../tmp/nsm_data/webqsp"
 
-    cp ${load_data_path}/* "../tmp/reader"
+    # cp ${load_data_path}/* "../tmp/reader"
 
     CUDA_VISIBLE_DEVICES=${device} python retrieve_subgraph.py \
         --load_data_path ${load_data_path} \

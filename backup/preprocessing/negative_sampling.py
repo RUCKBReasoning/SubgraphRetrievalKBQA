@@ -14,7 +14,9 @@ from func_timeout import func_set_timeout, FunctionTimedOut
 
 END_REL = "END OF HOP"
 
-@func_set_timeout(10)
+ALL_relations = set()
+
+# @func_set_timeout(5)
 def generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg):
     new_data_list = []
     neg_num = 15
@@ -31,7 +33,6 @@ def generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg):
     candidate_entities = deepcopy(topic_entities)
     # candidate_neg_rels = []
 
-    print("A0:", time())
     for rel in path[:-1]:
         current_filter_threshold *= filter_threshold
         # candidate_neg_rels.extend(list(set(sum([kg.get_relation(h) for h in candidate_entities], ()))))
@@ -44,9 +45,9 @@ def generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg):
         
         if len(candidate_entities) > current_filter_threshold:
             filter_flag = True
-    print("A1:", time())
-
+    
     # candidate_neg_rels = list(set(candidate_neg_rels))
+    candidate_neg_rels = list(ALL_relations)
     
     # print(len(candidate_neg_rels))
     
@@ -57,7 +58,7 @@ def generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg):
 
     prefix_list = []
     for rel in path:
-        print("B0:", time())
+        # print("B0:", time())
         prefix = ",".join(prefix_list)
         prefix_list.append(rel)
         
@@ -65,7 +66,7 @@ def generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg):
         data_row.append(question)
         data_row.append(rel)
 
-        print("B1:", time())
+        # print("B1:", time())
         neg_rels = []
         for h in topic_entities:
             h_rels = kg.get_relation(h)
@@ -75,35 +76,33 @@ def generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg):
         neg_rels = list(set(neg_rels))
         neg_rels.append(END_REL)
         neg_rels = [r for r in neg_rels if r not in pos_rels[prefix]]
-        print("B2:", time())
-
-        if len(neg_rels) > 0:
-            sample_rels = []
-            while len(sample_rels) < neg_num:
-                sample_rels.extend(neg_rels)
-            
-            neg_rels = random.sample(sample_rels, neg_num)
-            
-            if prefix in hard_neg_rels:
-                neg_rels = list(hard_neg_rels[prefix]) + neg_rels
-            
-            neg_rels = neg_rels[:neg_num]
-            
-            data_row.extend(neg_rels)
-            new_data_list.append(data_row)
+        if len(neg_rels) < neg_num:
+            neg_rels_set = set(neg_rels)
+            ext_rels = [r for r in candidate_neg_rels if r not in pos_rels[prefix] and r not in neg_rels_set]
+            assert len(ext_rels) > 0
+            while len(neg_rels) < neg_num:
+                neg_rels.extend(ext_rels)
+        neg_rels = random.sample(neg_rels, neg_num)
+        # print("B2:", time())        
+        
+        if prefix in hard_neg_rels:
+            neg_rels = list(hard_neg_rels[prefix]) + neg_rels
+        neg_rels = neg_rels[:neg_num]
+        
+        data_row.extend(neg_rels)
+        new_data_list.append(data_row)
         
         # update for next step
         if rel != END_REL:
-            print("B3:", time())
+            # print("B5:", time())
             next_question = question + f" {rel} #"
             next_topic_entities = []
             for h in topic_entities:
                 next_topic_entities.extend(kg.get_tail(h, rel))
             next_topic_entities = list(set(next_topic_entities))
-            print("B4:", time())
+            # print("B6:", time())            
             question = next_question
             topic_entities = next_topic_entities
-    print("END")
     return new_data_list
 
 
@@ -117,6 +116,11 @@ def run_negative_sampling(args):
     update_paths = {}
     if os.path.exists("../tmp/retriever/update_paths.json"):
         update_paths = load_json("../tmp/retriever/update_paths.json")
+
+    global ALL_relations
+    for _, rels in kg.head2relation.items():
+        for rel in rels:
+            ALL_relations.add(rel)
 
     new_data_list = []
     timeout_count = 0
@@ -149,10 +153,7 @@ def run_negative_sampling(args):
                     hard_neg_rels[prefix].add(rel)
         
         for path_json_obj in path_and_score_list:
-            try:
-                data = generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg)
-            except FunctionTimedOut:
-                continue
+            data = generate_data_list(path_json_obj, json_obj, pos_rels, hard_neg_rels, kg)
             if data is not None:
                 new_data_list.extend(data)
 
@@ -160,5 +161,5 @@ def run_negative_sampling(args):
     
     new_data_list = np.array(new_data_list)
     df = pd.DataFrame(new_data_list)
-    df.to_csv("../tmp/retriever/weak_supervised_train.csv", header=False, index=False)
+    df.to_csv("../tmp/retriever/weak_supervised_train_test.csv", header=False, index=False)
 

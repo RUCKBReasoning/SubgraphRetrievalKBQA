@@ -9,12 +9,12 @@ from loguru import logger
 knowledge_graph_ckpt = '../tmp/knowledge_graph.kg_data'
 load_data_path = "../tmp/reader"
 
-train_dataset = load_jsonl(os.path.join(load_data_path, "train_simple.json"))
-test_dataset = load_jsonl(os.path.join(load_data_path, "test_simple.json"))    
+# train_dataset = load_jsonl(os.path.join(load_data_path, "train_simple.json"))
+# test_dataset = load_jsonl(os.path.join(load_data_path, "test_simple.json"))    
 dev_dataset = load_jsonl(os.path.join(load_data_path, "dev_simple.json"))
 
-for dataset in [train_dataset, test_dataset, dev_dataset]:
-# for dataset in [dev_dataset]:
+# for dataset in [train_dataset, test_dataset, dev_dataset]:
+for dataset in [dev_dataset]:
     acc = []
     ave_ent = []
     ave_rel = []

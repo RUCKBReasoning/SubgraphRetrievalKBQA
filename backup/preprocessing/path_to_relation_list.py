@@ -13,8 +13,12 @@ from utils import load_jsonl, dump_jsonl
 
 def run_path_to_relation(args):
 
-    kg = KonwledgeGraphFreebase()
+    if args.KG_name == "EmbedKGQA":
+        kg = KonwledgeGraph.load_from_ckpt('../tmp/knowledge_graph.kg_data')
+    else:
+        kg = KonwledgeGraphFreebase()
 
+    G = kg.G
     all_jsonl = glob.glob('../tmp/preprocessing/*')
     data_list = sum([load_jsonl(filepath) for filepath in all_jsonl], [])
 
@@ -22,13 +26,13 @@ def run_path_to_relation(args):
     for (item, paths) in tqdm(data_list):
         m = set()
         for path in paths:
-            if isinstance(path, str):
-                path = (path,)
-            path = tuple(path)
-            if path == ("type.object.type", "type.type.instance"):
-                continue
-            m.add(path)
+            relation_list = []
+            for edge in path:
+                r = G.get_edge_data(*edge)['keyword']
+                relation_list.append(r)
+            m.add('\t'.join(relation_list))
         data_with_path_list.append((item, tuple(m)))
+
 
     def cal_path_val(topic_entity, path, answers):
         preds = kg.deduce_leaves_by_path(topic_entity, path)
@@ -45,7 +49,7 @@ def run_path_to_relation(args):
         topic_entities = item['topic_entities']
         path_and_score_list = []
         for p_str in p_strs:
-            path = p_str
+            path = p_str.split('\t')
             p_val_list = []
             for topic_entity in topic_entities:
                 p_val_list.append(cal_path_val(topic_entity, path, answers))

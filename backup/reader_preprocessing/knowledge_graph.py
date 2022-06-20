@@ -55,10 +55,7 @@ class KonwledgeGraph(object):
     def get_shorted_path_limit(self, src, tgt):
         return nx.shortest_path_length(self.G, src, tgt)
 
-    def have_entity(self, e):
-        return e in self.G
-    
-    def deduce_subgraph_by_path(self, src: str, path: List[str], no_hop_flag: str = 'END OF HOP') -> Tuple[List[str], List[Tuple[str, str, str]]]:
+    def deduce_subgraph_by_path(self, src: str, path: List[str], no_hop_flag: str = 'NoHop') -> Tuple[List[str], List[Tuple[str, str, str]]]:
         # 将子图实例化, 返回节点集合和边集合
         nodes, triples = set(), set()
         hop_nodes, next_hop_set = set(), set()
@@ -76,7 +73,7 @@ class KonwledgeGraph(object):
             nodes = nodes | hop_nodes
         return list(nodes), list(triples)
 
-    def deduce_leaves_by_path(self, src: str, path: List[str], no_hop_flag: str = 'END OF HOP') -> Tuple[str]:
+    def deduce_leaves_by_path(self, src: str, path: List[str], no_hop_flag: str = 'NoHop') -> Tuple[str]:
         # 效率瓶颈，有待优化
         hop_nodes, next_hop_set = set(), set()
         hop_nodes.add(src)

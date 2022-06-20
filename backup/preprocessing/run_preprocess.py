@@ -20,12 +20,12 @@ def run(args):
         train_dataset_path=args.train_dataset_path,
         test_dataset_path=args.test_dataset_path
     )
-    # if args.dataset_name == 'webqsp':
-    #     load_webqsp(path)
-    # else:
-    #     raise ValueError
-    # run_search_to_get_path(args)
-    # run_path_to_relation(args)
+    if args.dataset_name == 'webqsp':
+        load_webqsp(path)
+    else:
+        raise ValueError
+    run_search_to_get_path(args)
+    run_path_to_relation(args)
     run_negative_sampling(args)
     print("[preprocess finish]")
 
