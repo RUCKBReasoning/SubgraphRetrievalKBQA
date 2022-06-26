@@ -1,11 +1,11 @@
 
 # Dataset
 ## QA benchmark
-1.WebQuestionSP: Same as the original [WebQuestionSP QA dataset](https://www.microsoft.com/en-us/download/details.aspx?id=52763) <br>
-2.CWQ:Same as the original [CWQ dataset](https://allenai.org/data/complexwebquestions)
+1. WebQuestionSP： Same as the original [WebQuestionSP QA dataset](https://www.microsoft.com/en-us/download/details.aspx?id=52763).
+2. CWQ: Same as the original [CWQ dataset](https://allenai.org/data/complexwebquestions).
 
 ## KG
-1. Setup Freebase: We use the whole freebase as the knowledge base. Please follow [Freebase-Setup] (https://github.com/dki-lab/Freebase-Setup) to build a Virtuoso for the Freebase dataset. <br>
+1. Setup Freebase: We use the whole freebase as the knowledge base. Please follow [Freebase-Setup] (https://github.com/dki-lab/Freebase-Setup) to build a Virtuoso for the Freebase dataset. 
 2. To improve the data accessing efficiency, for the webqsp dataset, we also prepare a KB cache, in which we extract a two-hop subgraph including the freebase CVT node for each topic entity in the webqsp dataset. For the CWQ dataset, we prepare a KB cache, in which we extract a four-hop subgraph including the freebase CVT node for each topic entity in the CWQ dataset.
 
 # Running Instructions
