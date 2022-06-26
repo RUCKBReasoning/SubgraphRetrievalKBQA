@@ -1,7 +1,7 @@
 
 # WebQuestionSP
 ## QA benchmark
-WebQuestionSP: Same as the original [WebQuestionSP QA dataset](https://www.microsoft.com/en-us/download/details.aspx?id=52763)
+WebQuestionSP: Same as the original [WebQuestionSP QA dataset](https://www.microsoft.com/en-us/download/details.aspx?id=52763) <br>
 CWQ:Same as the original [CWQ dataset](https://allenai.org/data/complexwebquestions)
 
 ## KG
