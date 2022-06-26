@@ -45,12 +45,12 @@ def get_texts_embeddings(texts):
     return embeddings
 
 
-def get_path_pair(question, path_list: List[Tuple[str, List[str]]]):
+def get_path_pair(batch_question: List[str], batch_path_list: List[List[str]]):
     # 得到一个N*M的sentence map
         
-    N, M = len(path_list), max([len(path) for src, path in path_list])
+    N, M = len(batch_question), max([len(path) for path in batch_path_list])
     query_list_list, rel_list_list, mask_list = [], [], []
-    for src, path in path_list:
+    for question, path in zip(batch_question, batch_path_list):
         query_list = []
         rel_list = []
         mask = []
@@ -87,29 +87,39 @@ def finetune():
     train_dataset = load_jsonl(os.path.join(load_data_path, "finetune_simple.json"))
     dist_info = load_jsonl(os.path.join(load_data_path, "dist.info"))
 
-    for json_obj, dist_json_obj in tqdm(zip(train_dataset, dist_info), total=len(train_dataset)):
-        question = json_obj["question"]
-        path_list = json_obj["paths"]
-        answers = [x["kb_id"] for x in json_obj["answers"]]
-        entities = json_obj["subgraph"]["entities"]
-                
-        if set(answers) & set(entities) == 0:
-            for key in dist_json_obj.keys():
-                dist_json_obj[key] = 0.0
+    batch_size = 8
+    n = len(train_dataset)
+    batch_index = list(range(0, n, batch_size))
+    for index in tqdm(batch_index, total=len(batch_index)):
+        offset = min(n, index + batch_size) - index
+        batch_json_obj = train_dataset[index:index + offset]
+        batch_dist = dist_info[index:index + offset]
+        batch_question = [json_obj["question"] for json_obj in batch_json_obj]
+        batch_path_list = [json_obj["paths"][0][1] for json_obj in batch_json_obj]
         
-        answers_score = []
-        for e in answers:
-            answers_score.append(dist_json_obj[e] if e in dist_json_obj else 0.0)
-        weight = max(answers_score + [0.])
+        weights = []
+        for json_obj, dist_json_obj in zip(batch_json_obj, batch_dist):
+            answers = [x["kb_id"] for x in json_obj["answers"]]
+            entities = json_obj["subgraph"]["entities"]
+            
+            if set(answers) & set(entities) == 0:
+                for key in dist_json_obj.keys():
+                    dist_json_obj[key] = 0.0
+        
+            answers_score = []
+            for e in answers:
+                answers_score.append(dist_json_obj[e] if e in dist_json_obj else 0.0)
+            weight = max(answers_score + [0.])
+            weights.append(weight)
 
-        N, M, query_list, tgt_list, mask_list = get_path_pair(question, path_list)
+        N, M, query_list, tgt_list, mask_list = get_path_pair(batch_question, batch_path_list)
         
         query_emb = get_texts_embeddings(query_list).view(N, M, -1)
         target_emb = get_texts_embeddings(tgt_list).view(N, M, -1)
         item_score = torch.cosine_similarity(query_emb, target_emb, dim=-1)
         mask = torch.tensor(mask_list).to(item_score.device).view(N, M)
         
-        labels = torch.tensor([weight for _ in range(N)]).to(item_score.device).view(N)
+        labels = torch.tensor(weights).to(item_score.device).view(N)
 
         path_score = (item_score * mask).sum(-1) / mask.sum(-1)
         kld_loss = torch.nn.KLDivLoss()
@@ -120,4 +130,4 @@ def finetune():
         optimizer.step()
 
     # save model
-    torch.save(model.state_dict(), os.path.join(dump_model_path, "pytorch_model.bin"))
+    torch.save(model.state_dict(), os.path.join(dump_model_path, "pytorch_model_finetune.bin"))

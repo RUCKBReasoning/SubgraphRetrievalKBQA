@@ -1,6 +1,6 @@
 import os
 import subprocess
-# from retrieve_subgraph.retrieve_subgraph_for_finetune import run as run_retrieve_subgraph
+from retrieve_subgraph.retrieve_subgraph_for_finetune import run as run_retrieve_subgraph
 from retriever_finetune.retriever_finetune import finetune
 from config import cfg
 

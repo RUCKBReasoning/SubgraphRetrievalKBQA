@@ -17,12 +17,16 @@ class Config:
             },
             "step3": {
                 "load_data_path": "tmp/preprocessing/step2.json",
+                # "load_data_path": "tmp/preprocessing/supervised_data_train.json",
                 "dump_data_path": "tmp/retriever/train.csv",
+                # "dump_data_path": "tmp/retriever/sup_train.csv",
                 "dump_data_folder": "tmp/retriever",
             }
         }
         self.train_retriever = {
+            # "load_data_path": "tmp/retriever/sup_train.csv",
             "load_data_path": "tmp/retriever/train.csv",
+            # "dump_model_path": "tmp/model_ckpt/sup_SimBERT"
             "dump_model_path": "tmp/model_ckpt/SimBERT"
         }
         self.retriever_model_ckpt = self.train_retriever["dump_model_path"]
