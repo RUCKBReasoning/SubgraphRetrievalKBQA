@@ -9,32 +9,31 @@
 2. To improve the data accessing efficiency, for the webqsp dataset, we also prepare a KB cache, in which we extract a two-hop subgraph including the freebase CVT nodes for each topic entity in the webqsp dataset. For the CWQ dataset, we prepare a KB cache, in which we extract a four-hop subgraph including the freebase CVT nodes for each topic entity in the CWQ dataset. Download (TODO).
 
 # Running Instructions
-## Step0: Obtain the weak-supervised dataset for training the retriever?
+## Step0: Prepare the weak-supervised dataset for training the retriever：
 
     python run_preprocess.py
 
-## Step1: Train the retriever
+## Step1: Train the retriever：
 
     python run_train_retriever.py
 
-## Step2: Extract a subgraph for each data instance.
+## Step2: Extract a subgraph for each data instance：
 
     python run_retrieve_subgraph.py
 
-## Step3: Train the reasoner
+## Step3: Train the reasoner：
 
     python run_train_nsm.py
 
-## Step4: Fine-tune the retriever by the feeback of the reasoner
+## Step4: Fine-tune the retriever by the feeback of the reasoner：
 
     python run_retriever_finetune.py
 
-
-## You can also directly run 
+## You can also directly run：
     
     ./run.sh
 
-## Download the data:
+## Download the data：
     
     The data folder tmp can be downloaded from [here](https://pan.baidu.com/s/1EUR5kxDxiDr-SzZ2dQ4bPQ?pwd=y408) with password y408.
 
