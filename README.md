@@ -28,11 +28,11 @@ Freebase.
     python run_retriever_finetune.py
 
 
-## Whole steps: wou can also directly run 
+## You can also directly run 
     
     ./run.sh
 
-## Data to download:
+## Download the data:
     
     The data folder tmp can be downloaded from [here](https://pan.baidu.com/s/1EUR5kxDxiDr-SzZ2dQ4bPQ?pwd=y408) with password y408.
 
