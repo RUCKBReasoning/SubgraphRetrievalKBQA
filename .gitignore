@@ -1,6 +1,7 @@
-code/tmp/
+backup/
+**/tmp/
 **/__pycache__/
 **/data/
 download/
+scripts/
 **/*.log
-tmp.py
