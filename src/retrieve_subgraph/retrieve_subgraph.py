@@ -13,9 +13,10 @@ from transformers import AutoModel, AutoTokenizer
 
 from loguru import logger
 
-from knowledge_graph.knowledge_graph import KnowledgeGraph
-from knowledge_graph.knowledge_graph_cache import KnowledgeGraphCache
-from knowledge_graph.knowledge_graph_freebase import KnowledgeGraphFreebase
+# from knowledge_graph.knowledge_graph import KnowledgeGraph
+# from knowledge_graph.knowledge_graph_cache import KnowledgeGraphCache
+# from knowledge_graph.knowledge_graph_freebase import KnowledgeGraphFreebase
+from knowledge_graph.knowledge_graph_base import KnowledgeGraphBase
 from config import cfg
 
 END_REL = "END OF HOP"
@@ -29,7 +30,9 @@ device = 'cuda'
 
 print("[load model begin]")
 
-kg = KnowledgeGraphCache()
+# kg = KnowledgeGraphCache()
+kg = KnowledgeGraphBase(triple='./tmp/subgraph_2hop_triple.npy',
+                        ent_type='./tmp/ent_type_ary.npy')
 tokenizer = AutoTokenizer.from_pretrained(retrieval_model_ckpt)
 model = AutoModel.from_pretrained(retrieval_model_ckpt)
 model = model.to(device)
@@ -38,10 +41,12 @@ print("[load model end]")
 
 def path_to_subgraph(topic_entity: str, path: List[str]):
     """输入topic_entity, path, 得到对应的实例化子图——节点集合、三元组集合"""
+    # TODO: add relation conversions(both conversions)
     return kg.deduce_subgraph_by_path(topic_entity, path)
 
 def path_to_candidate_relations(topic_entity: str, path: List[str]) -> List[str]:
     """输入topic_entity, 得到叶子结点能提供的候选relation的集合"""
+    # TODO: change this method; when input, add relationLabel2id, when output, add id2relationLabel
     new_relations = kg.deduce_leaves_relation_by_path(topic_entity, path)
     # filter relation
     candidate_relations = [r for r in new_relations if r.split(".")[0] not in ["kg", "common"]]
@@ -73,6 +78,7 @@ def score_path_list_and_relation_list(question: str, path_list: List[List[str]],
     
     all_relation_list = list(set(sum(relation_list_list, [])))
     # END_relation_index = all_relation_list.index(END_REL)
+    # TODO Add cache or pre-calculate relation embeding
     q_emb = get_texts_embeddings(query_lined_list).unsqueeze(1)  # [B, 1, D]
     target_emb = get_texts_embeddings(all_relation_list).unsqueeze(0)  # [1, L, D]
     sim_score = torch.cosine_similarity(q_emb, target_emb, dim=2) / theta  # [B, L]
@@ -103,7 +109,8 @@ def infer_paths_from_kb(question: str, topic_entity: str, num_beams: int, num_re
             path_list.append(path)
             path_score_list.append(path_score)
             # logger.info(f'path_to_candidate_relations: {topic_entity}, {path}')
-            candidate_relations = path_to_candidate_relations(
+            candidate_relations = path_to_candidate_relations( # Return paths in STRING; KG-BASE return Int Indexs
+                # TODO: Return Int Index back to Relation name/label 
                 topic_entity, path)
             candidate_relations = candidate_relations + [END_REL]
             relation_list_list.append(candidate_relations)

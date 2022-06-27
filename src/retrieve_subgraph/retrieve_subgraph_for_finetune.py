@@ -13,9 +13,10 @@ from transformers import AutoModel, AutoTokenizer
 
 from loguru import logger
 
-from knowledge_graph.knowledge_graph import KnowledgeGraph
-from knowledge_graph.knowledge_graph_cache import KnowledgeGraphCache
-from knowledge_graph.knowledge_graph_freebase import KnowledgeGraphFreebase
+# from knowledge_graph.knowledge_graph import KnowledgeGraph
+# from knowledge_graph.knowledge_graph_cache import KnowledgeGraphCache
+# from knowledge_graph.knowledge_graph_freebase import KnowledgeGraphFreebase
+from knowledge_graph.knowledge_graph_base import KnowledgeGraphBase
 from config import cfg
 
 END_REL = "END OF HOP"
@@ -29,7 +30,9 @@ device = 'cuda'
 
 print("[load model begin]")
 
-kg = KnowledgeGraphCache()
+# kg = KnowledgeGraphCache()
+kg = KnowledgeGraphBase(triple='./tmp/subgraph_2hop_triple.npy',
+                        ent_type='./tmp/ent_type_ary.npy')
 tokenizer = AutoTokenizer.from_pretrained(retrieval_model_ckpt)
 model = AutoModel.from_pretrained(retrieval_model_ckpt)
 model = model.to(device)
