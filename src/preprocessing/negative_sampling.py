@@ -3,10 +3,10 @@
 from tqdm import tqdm
 from torch import threshold
 from utils import load_jsonl, dump_jsonl
-from knowledgeGraphBase import KnowledgeGraphBase
-kg = KnowledgeGraphBase('subgraph_2hop_triple.npy', 'ent_type_ary.npy')
+from knowledge_graph.knowledge_graph_base import KnowledgeGraphBase
+kg = KnowledgeGraphBase('./tmp/subgraph_2hop_triple.npy', './tmp/ent_type_ary.npy')
 # %%
-dataset = load_jsonl('cwq_all_relation_path_and_val.jsonl')
+dataset = load_jsonl('./tmp/cwq_all_relation_path_and_val.jsonl')
 # %%
 item = dataset[0]
 # %%
@@ -54,5 +54,5 @@ for item in tqdm(dataset):
         all_search_state_list.append(state)
 
 # %%
-dump_jsonl(all_search_state_list, 'cwq_full_with_search_state.jsonl')
+dump_jsonl(all_search_state_list, './tmp/cwq_full_with_search_state.jsonl')
 # %%
