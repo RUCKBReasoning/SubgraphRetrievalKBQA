@@ -31,8 +31,7 @@ device = 'cuda'
 print("[load model begin]")
 
 # kg = KnowledgeGraphCache()
-kg = KnowledgeGraphBase(triple='./tmp/subgraph_2hop_triple.npy',
-                        ent_type='./tmp/ent_type_ary.npy')
+kg = KnowledgeGraphBase()
 tokenizer = AutoTokenizer.from_pretrained(retrieval_model_ckpt)
 model = AutoModel.from_pretrained(retrieval_model_ckpt)
 model = model.to(device)
@@ -278,3 +277,4 @@ def run():
         new_dataset.extend(data_list)
     
     dump_jsonl(new_dataset, os.path.join(load_data_folder, "finetune_simple.json"))
+

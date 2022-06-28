@@ -23,8 +23,9 @@ for dataset in [train_dataset, test_dataset, dev_dataset]:
     ave_ent = []
     ave_rel = []
     for json_obj in tqdm(dataset):
-        answers = [ans_json_obj["kb_id"]
-                   for ans_json_obj in json_obj["answers"]]
+        # answers = [ans_json_obj["kb_id"]
+        #            for ans_json_obj in json_obj["answers"]]
+        answers = json_obj['answers_cid']
         answers = set(answers)
         subgraph_entities = set(json_obj["subgraph"]["entities"])
 

@@ -7,11 +7,11 @@ from loguru import logger
 from config import cfg
 
 def run():
-    load_data_path = cfg.retrieve_subgraph["dump_data_folder"]
-
-    train_dataset = load_jsonl(os.path.join(load_data_path, "train_simple.json"))
-    test_dataset = load_jsonl(os.path.join(load_data_path, "test_simple.json"))
-    dev_dataset = load_jsonl(os.path.join(load_data_path, "dev_simple.json"))
+    # load_data_path = cfg.retrieve_subgraph["dump_data_folder"]
+    load_data_path = "./debug/"
+    train_dataset = load_jsonl(os.path.join(load_data_path, "train_simple_debug.json"))
+    test_dataset = load_jsonl(os.path.join(load_data_path, "test_simple_debug.json"))
+    dev_dataset = load_jsonl(os.path.join(load_data_path, "dev_simple_debug.json"))
 
     entity_set = set()
     relation_set = set()
@@ -20,8 +20,11 @@ def run():
 
     for dataset in [train_dataset, test_dataset, dev_dataset]:
         for json_obj in tqdm(dataset):
-            answers = {ans_json_obj["kb_id"]
-                    for ans_json_obj in json_obj["answers"]}
+            if "subgraph" not in json_obj:
+                print("Slic with no SubGraph")
+                continue
+            answers = {ans_json_obj
+                    for ans_json_obj in json_obj["answers_cid"]}
             subgraph_entities = set(json_obj["subgraph"]["entities"])
             subgraph_relations = {r for h, r, t in json_obj["subgraph"]["tuples"]}
             entity_set = entity_set | answers | subgraph_entities
