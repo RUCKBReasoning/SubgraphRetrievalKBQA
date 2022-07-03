@@ -28,7 +28,7 @@
 
 ## Step4: Fine-tune the retriever by the feeback of the reasoner：
 
-    python run_retriever_finetune.py
+    python run_end2end_nsm.py or python run_end2end_graftnet.py
 
 ## You can also directly run：
     
