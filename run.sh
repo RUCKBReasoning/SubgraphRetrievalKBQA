@@ -10,6 +10,4 @@ python run_train_retriever.py
 
 python run_retrieve_subgraph.py
 
-# python run_train_nsm.py
-
-# python run_retriever_finetune.py
+python run_train_nsm.py

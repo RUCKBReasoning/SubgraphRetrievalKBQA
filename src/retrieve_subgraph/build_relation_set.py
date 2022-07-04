@@ -22,7 +22,7 @@ def run():
         for json_obj in tqdm(dataset):
             answers = {ans_json_obj["kb_id"]
                     for ans_json_obj in json_obj["answers"]}
-            subgraph_entities = set(json_obj["subgraph"]["entities"])
+            subgraph_entities = set(json_obj["subgraph"]["entities"]) | set(json_obj["entities"])
             subgraph_relations = {r for h, r, t in json_obj["subgraph"]["tuples"]}
             entity_set = entity_set | answers | subgraph_entities
             relation_set = relation_set | subgraph_relations

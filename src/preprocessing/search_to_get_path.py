@@ -39,7 +39,7 @@ def run_search_to_get_path():
     dump_data_path = cfg.preprocessing["step1"]["dump_data_path"]
     kg = KnowledgeGraphFreebase()
     train_dataset = load_jsonl(load_data_path)
-
+    
     outf = open(dump_data_path, 'w')
     for item in tqdm(train_dataset):
         try:

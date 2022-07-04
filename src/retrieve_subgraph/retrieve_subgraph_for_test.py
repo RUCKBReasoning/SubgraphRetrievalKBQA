@@ -19,15 +19,25 @@ from knowledge_graph.knowledge_graph import KnowledgeGraph
 from knowledge_graph.knowledge_graph_cache import KnowledgeGraphCache
 from knowledge_graph.knowledge_graph_freebase import KnowledgeGraphFreebase
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--load_data_folder", type=str, required=True)
+parser.add_argument("--dump_data_folder", type=str, required=True)
+parser.add_argument("--model_ckpt", type=str, required=True)
+parser.add_argument("--top_k", type=int, default=10)
+args = parser.parse_args()
+
+
 END_REL = "END OF HOP"
 
-TOP_K = 1
+TOP_K = args.top_k
 
 _min_score = 1e5
 
-retrieval_model_ckpt = "../tmp/model_ckpt/SimBERT"
+retrieval_model_ckpt = args.model_ckpt
 device = 'cuda'
 
+print("model_ckpt: {}".format(retrieval_model_ckpt))
 print("[load model begin]")
 
 kg = KnowledgeGraphCache("../tmp/subgraph_hop1.txt")
@@ -271,41 +281,29 @@ def build_entities(load_data_path):
     return entities
 
 
-def run():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--load_data_folder", type=str, required=True)
-    parser.add_argument("--dump_data_folder", type=str, required=True)
-    args = parser.parse_args()
+load_data_folder = args.load_data_folder
+dump_data_folder = args.dump_data_folder
+
+if not os.path.exists(dump_data_folder):
+    os.makedirs(dump_data_folder)
     
-    load_data_folder = args.load_data_folder
-    dump_data_folder = args.dump_data_folder
+print("dump_data_folder:", dump_data_folder)
     
-    if not os.path.exists(dump_data_folder):
-        os.makedirs(dump_data_folder)
-        
-    print("dump_data_folder:", dump_data_folder)
-        
-    train_dataset = load_jsonl(os.path.join(load_data_folder, "train_simple.json"))
-    test_dataset = load_jsonl(os.path.join(load_data_folder, "test_simple.json"))    
-    dev_dataset = load_jsonl(os.path.join(load_data_folder, "dev_simple.json"))    
+train_dataset = load_jsonl(os.path.join(load_data_folder, "train_simple.json"))
+test_dataset = load_jsonl(os.path.join(load_data_folder, "test_simple.json"))    
+dev_dataset = load_jsonl(os.path.join(load_data_folder, "dev_simple.json"))    
 
-    entities = build_entities(load_data_folder)
-    
-    for json_obj in tqdm(train_dataset, desc="retrieve:train"):
-        retrieve_subgraph(json_obj, entities)
-    
-    for json_obj in tqdm(test_dataset, desc="retrieve:test"):
-        retrieve_subgraph(json_obj, entities)
+entities = build_entities(load_data_folder)
 
-    for json_obj in tqdm(dev_dataset, desc="retrieve:dev"):
-        retrieve_subgraph(json_obj, entities)
+for json_obj in tqdm(train_dataset, desc="retrieve:train"):
+    retrieve_subgraph(json_obj, entities)
 
-    dump_jsonl(train_dataset, os.path.join(dump_data_folder, "train_simple.json"))
-    dump_jsonl(test_dataset, os.path.join(dump_data_folder, "test_simple.json"))
-    dump_jsonl(dev_dataset, os.path.join(dump_data_folder, "dev_simple.json"))
+for json_obj in tqdm(test_dataset, desc="retrieve:test"):
+    retrieve_subgraph(json_obj, entities)
 
-    print("min score:", _min_score)
+for json_obj in tqdm(dev_dataset, desc="retrieve:dev"):
+    retrieve_subgraph(json_obj, entities)
 
-
-if __name__ == '__main__':
-    run()
+dump_jsonl(train_dataset, os.path.join(dump_data_folder, "train_simple.json"))
+dump_jsonl(test_dataset, os.path.join(dump_data_folder, "test_simple.json"))
+dump_jsonl(dev_dataset, os.path.join(dump_data_folder, "dev_simple.json"))

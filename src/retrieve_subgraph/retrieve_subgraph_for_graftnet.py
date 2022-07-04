@@ -1,18 +1,20 @@
 import argparse
 import json
 import os
+from numpy import tri
 import torch
 import subprocess
 
-from typing import Tuple, List, Any, Dict, Set
+from typing import Tuple, List, Any, Dict
 
 from utils import dump_jsonl, load_jsonl
 from tqdm import tqdm
-from func_timeout import func_set_timeout, FunctionTimedOut
 from transformers import AutoModel, AutoTokenizer
 
 from loguru import logger
 
+import sys
+sys.path.append("./..")
 from knowledge_graph.knowledge_graph import KnowledgeGraph
 from knowledge_graph.knowledge_graph_cache import KnowledgeGraphCache
 from knowledge_graph.knowledge_graph_freebase import KnowledgeGraphFreebase
@@ -22,12 +24,12 @@ END_REL = "END OF HOP"
 
 TOP_K = 10
 
-retrieval_model_ckpt = cfg.retriever_model_ckpt
+retrieval_model_ckpt = "../tmp/model_ckpt/SimBERT"
 device = 'cuda'
 
 print("[load model begin]")
 
-kg = KnowledgeGraphCache()
+kg = KnowledgeGraphCache('../tmp/subgraph_hop1.txt')
 tokenizer = AutoTokenizer.from_pretrained(retrieval_model_ckpt)
 model = AutoModel.from_pretrained(retrieval_model_ckpt)
 model = model.to(device)
@@ -191,19 +193,34 @@ def build_graph(nodes: List[str], triples: List[str]):
         G.setdefault(h, []).append(t)
     return G
 
+def add_tag(x: str):
+    return "<fb:{}>".format(x)
 
-def retrieve_subgraph(json_obj: Dict[str, Any], entities: Set, rels: Set):
-    data_list = []
+def del_tag(x: str):
+    return x[4:-1]
 
+def retrieve_subgraph(json_obj: Dict[str, Any], entities, rels):
+    # logger.info("[sample]")
+    
     question = json_obj["question"]
     if len(json_obj["entities"]) == 0:
         return
     
     answers = set([ans_obj["kb_id"] for ans_obj in json_obj["answers"]])
-        
-    for topic_entity in json_obj["entities"]:
+    
+    paths = []  # List[Tuple[str, List[relation]]]
+    graphs = []
+    
+    # print("len entities:", len(json_obj["entities"]))
+    # logger.info(f'question: {question}')
+    for ent_obj in json_obj["entities"]:
+        topic_entity = ent_obj['kb_id']
 
+        # preprocess
+        topic_entity = del_tag(topic_entity)
+        
         path_score_list = infer_paths_from_kb(question, topic_entity, TOP_K, TOP_K, 2)
+        
         nodes = []
         triples = []
 
@@ -214,31 +231,41 @@ def retrieve_subgraph(json_obj: Dict[str, Any], entities: Set, rels: Set):
             partial_nodes, partial_triples = path_to_subgraph(topic_entity, path)
             if len(partial_nodes) > 1000:
                 continue
-            
-            partial_nodes = [e for e in partial_nodes if e in entities]
-            partial_triples = [(h, r, t) for h, r, t in partial_triples 
-                               if h in entities and t in entities and r in rels]
-            
             nodes.extend(partial_nodes)
             triples.extend(partial_triples)
-            
-            data_list.append({
-                "id": json_obj["id"],
-                "question": json_obj["question"],
-                "entities": json_obj["entities"],
-                "answers": json_obj["answers"],
-                "paths": [(topic_entity, path)],
-                "subgraph": {
-                    "entities": partial_nodes,
-                    "tuples": partial_triples
-                }
-            })
             
             if len(answers & set(partial_nodes)) > 0:
                 min_score = min(min_score, score)
             if len(nodes) > threshold_ent_size:
                 break
-    return data_list
+        graphs.append((topic_entity, nodes, triples, build_graph(nodes, triples)))
+        
+    n = len(graphs)
+    for i in range(1, n):
+        g0 = graphs[0]
+        gi = graphs[i]
+        topic_entity = g0[0]
+        nodes = merge_graph(g0[3], g0[0], gi[3], gi[0])
+        triples = [(h, r, t) for h, r, t in list(set(g0[2]) | set(gi[2])) if h in nodes and t in nodes]        
+        graph = build_graph(nodes, triples)
+        graphs[0] = (topic_entity, nodes, triples, graph)
+    
+    nodes = graphs[0][1]
+    triples = graphs[0][2]
+    
+    nodes = [add_tag(x) for x in nodes]
+    triples = [(add_tag(h), add_tag(r), add_tag(t)) for h, r, t in triples]
+    
+    nodes = list(set(nodes))
+    triples = list(set(triples))
+    subgraph_entities = [{'kb_id': e, 'text': e} for e in nodes if e in entities]
+    subgraph_tuples = [({'kb_id': h, 'text': h}, {'rel_id': r, 'text': r}, {'kb_id': t, 'text': t}) for h, r, t in triples 
+                       if h in entities and t in entities and r in rels]
+    
+    json_obj["subgraph"] = {
+        "tuples": subgraph_tuples,
+        "entities": subgraph_entities
+    }
 
 
 def build_entities(load_data_path):
@@ -247,6 +274,7 @@ def build_entities(load_data_path):
         for line in f.readlines():
             entities.append(line.strip())
     return entities
+
 
 def build_relations(load_data_path):
     rels = []
@@ -257,19 +285,31 @@ def build_relations(load_data_path):
 
 
 def run():
-    load_data_folder = cfg.retriever_finetune["load_data_path"]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--load_data_folder", type=str, required=True)
+    args = parser.parse_args()
     
-    train_dataset = load_jsonl(os.path.join(load_data_folder, "train_simple.json"))
-
+    load_data_folder = args.load_data_folder
+    
+    train_dataset = load_jsonl(os.path.join(load_data_folder, "train_bak.json"))            
+    test_dataset = load_jsonl(os.path.join(load_data_folder, "test_bak.json"))    
+    dev_dataset = load_jsonl(os.path.join(load_data_folder, "dev_bak.json"))    
+    
     entities = build_entities(load_data_folder)
     rels = build_relations(load_data_folder)
-    
-    entities = set(entities)
-    rels = set(rels)
-    
-    new_dataset = []
+
     for json_obj in tqdm(train_dataset, desc="retrieve:train"):
-        data_list = retrieve_subgraph(json_obj, entities, rels)
-        new_dataset.extend(data_list)
+        retrieve_subgraph(json_obj, entities, rels)
     
-    dump_jsonl(new_dataset, os.path.join(load_data_folder, "finetune_simple.json"))
+    for json_obj in tqdm(test_dataset, desc="retrieve:test"):
+        retrieve_subgraph(json_obj, entities, rels)
+
+    for json_obj in tqdm(dev_dataset, desc="retrieve:dev"):
+        retrieve_subgraph(json_obj, entities, rels)
+
+    dump_jsonl(test_dataset, os.path.join(load_data_folder, "train.json"))
+    dump_jsonl(test_dataset, os.path.join(load_data_folder, "test.json"))
+    dump_jsonl(test_dataset, os.path.join(load_data_folder, "dev.json"))
+
+if __name__ == '__main__':
+    run()

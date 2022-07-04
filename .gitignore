@@ -1,7 +1,8 @@
 backup/
+download/
 **/tmp/
 **/__pycache__/
 **/data/
-download/
-scripts/
 **/*.log
+**/model/
+**/datasets/
