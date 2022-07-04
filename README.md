@@ -24,11 +24,11 @@
 
 ## Step3: Train the reasoner：
 
-    python run_train_nsm.py or python run_train_graftnet.py
+    python run_train_nsm.py
 
 ## Step4: Fine-tune the retriever by the feeback of the reasoner：
 
-    python run_end2end_nsm.py or python run_end2end_graftnet.py
+    python run_retriever_finetune.py
 
 ## You can also directly run：
     
@@ -36,9 +36,10 @@
 
 ## Download the data：
     
-    The data folder tmp can be downloaded from [here](https://pan.baidu.com/s/1EUR5kxDxiDr-SzZ2dQ4bPQ?pwd=y408) with password y408.
-    
+    The data folder tmp can be downloaded from [here]().
 
+## For CWQ, you can run ./cwq/run.sh
+       
 ### If you have any questions about the code, please contact Xiaokang Zhang (zhang2718@ruc.edu.cn)! 
 
 
