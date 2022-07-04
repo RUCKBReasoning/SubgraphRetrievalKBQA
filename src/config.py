@@ -57,6 +57,7 @@ class Config:
             "checkpoint_dir": "tmp/model_ckpt/nsm/",
             "load_data_path": "tmp/reader_data/webqsp/",
             "dump_model_path": "tmp/model_ckpt/SimBERT/",
+            "dump_data_path": "tmp/retriever/",
         }
 
 cfg = Config()
