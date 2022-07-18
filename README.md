@@ -6,7 +6,7 @@
 
 ## KG
 1. Setup Freebase: We use the whole freebase as the knowledge base. Please follow [Freebase-Setup](https://github.com/dki-lab/Freebase-Setup) to build a Virtuoso for the Freebase dataset. 
-2. To improve the data accessing efficiency, we extract a 2-hop topic-centric subgraph for each question in WebQSP and a 4-hop topic-centric subgraph for each question in CWQ to create relatively small knowledge graphs. We extract these small knowledge graphs following [NSM](https://github.com/RichardHGL/WSDM2021_NSM). You can download the graphs from [here]()
+2. To improve the data accessing efficiency, we extract a 2-hop topic-centric subgraph for each question in WebQSP and a 4-hop topic-centric subgraph for each question in CWQ to create relatively small knowledge graphs. We extract these small knowledge graphs following [NSM](https://github.com/RichardHGL/WSDM2021_NSM). You can download the graphs from [here](https://drive.google.com/drive/folders/1qNauEQJHuMs4uPQcCtMb-M9Seco5mTUl?usp=sharing)
 
 # Running Instructions for WebQSP
 ## Step0: Prepare the weak-supervised dataset for training the retriever：
@@ -36,7 +36,7 @@
 
 ## Download the data：
     
-    The data folder tmp can be downloaded from [here]().
+    The data folder tmp can be downloaded from [here](https://drive.google.com/drive/folders/1qNauEQJHuMs4uPQcCtMb-M9Seco5mTUl?usp=sharing).
 
 ## For CWQ, you can run ./cwq/run.sh
        
