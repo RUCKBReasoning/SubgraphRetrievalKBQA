@@ -1,4 +1,4 @@
-cd reader_nsm
+cd nsm_reader
 
 load_data_path=${1}
 dump_model_path=${2}

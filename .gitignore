@@ -6,3 +6,4 @@ download/
 **/*.log
 **/model/
 **/datasets/
+!src/nsm_reader/NSM/data
