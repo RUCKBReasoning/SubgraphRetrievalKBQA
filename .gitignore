@@ -7,3 +7,4 @@ download/
 **/model/
 **/datasets/
 !src/nsm_reader/NSM/data
+!src/retriever_finetune/NSM/data

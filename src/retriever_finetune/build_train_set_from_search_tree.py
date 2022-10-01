@@ -57,4 +57,7 @@ df = pd.DataFrame(all_data_list)
 # %%
 # dump_data_path = './e2e_train_data.csv'
 dump_data_path = os.path.join(args.dump_data_path, 'e2e_train_data.csv')
+if not os.path.exists(args.dump_data_path):
+    print(f"Mkdir at {args.dump_data_path}")
+    os.makedirs(args.dump_data_path)
 df.to_csv(dump_data_path, header=False, index=False)
